@@ -1,6 +1,7 @@
 use crate::game::entities::{Entity, EntityType};
 use crate::game::generate_entities::*;
 use crate::game::map::Point;
+use crate::game::key_bind_config::KeyBindConfig;
 use crate::parser::map_parser::SCALING_FACTOR;
 use crate::render::RendererData;
 use anyhow::{Error, Result};
@@ -20,18 +21,23 @@ pub struct ParserEntity {
     enemy_type: i32,       //b from rgba-value
 }
 
-pub fn parse_entities(path: String, renderer_data: &RendererData) -> Result<Vec<Entity>> {
+pub fn parse_entities(
+    path: String,
+    renderer_data: &RendererData,
+    key_bindings: KeyBindConfig,
+) -> Result<Vec<Entity>> {
     // ZIP-Archiv öffnen
     let file = File::open(path)?;
     let mut archive = ZipArchive::new(file)?;
     let mut xml_file = archive.by_name("geogebra.xml")?;
 
     // XML-Inhalt lesen
-    read_entitties_from_file(&mut xml_file, renderer_data)
+    read_entitties_from_file(&mut xml_file, renderer_data, key_bindings)
 }
 pub fn read_entitties_from_file(
     xml_file: &mut ZipFile<File>,
     renderer_data: &RendererData,
+    key_bindings: KeyBindConfig,
 ) -> Result<Vec<Entity>> {
     let mut xml_contents = String::new();
     xml_file.read_to_string(&mut xml_contents)?;
@@ -58,7 +64,7 @@ pub fn read_entitties_from_file(
 
                 match (element_type.as_deref(), label.as_str()) {
                     (Some("point"), label) if label.starts_with("Enemy") => {
-                        read_point(&mut reader, &mut buf, &mut entities, renderer_data)?
+                        read_point(&mut reader, &mut buf, &mut entities, renderer_data, key_bindings)?
                     }
                     _ => {}
                 }
@@ -78,6 +84,7 @@ fn read_point(
     buf: &mut Vec<u8>,
     player_vec: &mut Vec<Entity>,
     renderer_data: &RendererData,
+    key_bindings: KeyBindConfig,
 ) -> Result<()> {
     let mut x = None;
     let mut y = None;
@@ -127,6 +134,7 @@ fn read_point(
         facing_direction.ok_or(Error::msg("Error Parsing entity at facing_direction"))?,
         renderer_data,
         0.0,
+        key_bindings,
     );
 
     if let Some(entities_pushing) = entities_pushing {

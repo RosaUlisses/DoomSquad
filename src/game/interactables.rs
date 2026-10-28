@@ -175,6 +175,7 @@ impl Interactable {
                         0.0,
                         _renderer_data,
                         0.0,
+                        game_state.key_bindings,
                     );
                     audio.play_sfx("summoner", 1.0);
                     if let Some(entity) = entity {
@@ -241,6 +242,7 @@ impl Interactable {
                         0.0,
                         _renderer_data,
                         0.0,
+                        game_state.key_bindings,
                     );
                     if let Some(entity) = entity {
                         game_state.entities.push(entity);

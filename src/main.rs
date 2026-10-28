@@ -196,12 +196,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
 
-        save_key_bindigs_config(key_bindings)?;
 
         if let Err(e) = window.update_with_buffer(&buffer, SCREEN_WIDTH, SCREEN_HEIGHT) {
             eprintln!("failed to update the window: {e}");
             return Err(Box::new(e));
         }
+        
     }
+
+    save_key_bindigs_config(key_bindings)?;
     Ok(())
 }

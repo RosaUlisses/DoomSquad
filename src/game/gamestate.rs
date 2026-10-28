@@ -68,7 +68,7 @@ impl Game {
                     parse_player_position(path.to_string(), renderer_data).ok()?,
                             key_bindings,
                 ),
-                entities: parse_entities(path.to_string(), renderer_data).ok()?,
+                entities: parse_entities(path.to_string(), renderer_data, key_bindings).ok()?,
                 interactables: parse_interactables(path.to_string(), renderer_data).ok()?,
                 map: parse_map(path.to_string()).ok()?, // TODO remove unwrap
                 despawn_timer: DESPAWN_TIME,
@@ -167,7 +167,7 @@ impl Game {
             } else {
                 eprintln!("Error parsing map");
             }
-            if let Ok(entities) = parse_entities(path.to_string(), renderer_data) {
+            if let Ok(entities) = parse_entities(path.to_string(), renderer_data, self.key_bindings) {
                 self.entities = entities;
             } else {
                 eprintln!("Error parsing entities");

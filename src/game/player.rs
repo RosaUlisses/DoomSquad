@@ -204,6 +204,7 @@ impl Player {
                 self.mover.facing_direction,
                 renderer_data,
                 self.vertcal_aim,
+                self.key_bindings,
             );
             if let Some(bullet) = bullet {
                 events.push(Spawn(bullet));
@@ -228,6 +229,7 @@ impl Player {
                 self.mover.facing_direction,
                 renderer_data,
                 self.vertcal_aim,
+                self.key_bindings,
             );
             if let Some(arrow) = arrow {
                 events.push(Spawn(arrow));
@@ -537,7 +539,7 @@ impl Player {
             }
         }
 
-        if window.is_key_down(self.key_bindings.move_crosshair_up) {
+        if window.is_key_down(self.key_bindings.move_crosshair_down) {
             match self.aim_mode {
                 false => {
                     self.vertcal_aim = (self.vertcal_aim + VERTICAL_AIM_SPEED).clamp(-1.0, 1.0)

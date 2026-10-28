@@ -325,6 +325,10 @@ impl Menu {
         }
 
         game.key_bindings = *key_bindings;
+        game.player.key_bindings = *key_bindings;
+        for entity in &mut game.entities {
+            entity.key_bindings = *key_bindings;
+        }
 
         Self::draw_text_centered(
             buffer,

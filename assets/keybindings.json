@@ -4,7 +4,7 @@
   "enter_godmode": "G",
   "exit_to_main_menu": "Escape",
   "fire_arrow": "RightShift",
-  "fire_bullet": "RightCtrl",
+  "fire_bullet": "Enter",
   "forwards": "W",
   "interact": "F",
   "jump": "Space",

@@ -1,4 +1,4 @@
-use minifb::{Key, Window};
+use minifb::Window;
 
 use crate::audio::audio_handler::Audio;
 use crate::game::entities::EntityType::*;
@@ -144,7 +144,7 @@ pub struct Entity {
     pub size: f64,
     pub did_damage: bool,
     pub vertical_aim: f64,
-    pub key_bindings: KeyBindConfig
+    pub key_bindings: KeyBindConfig,
 }
 
 impl Entity {
@@ -205,7 +205,7 @@ impl Entity {
     ) -> Vec<EntityEvent> {
         //collect all Spawn events for gamestate
         let mut events: Vec<EntityEvent> = Vec::new();
-        if window.is_key_pressed(Key::L, minifb::KeyRepeat::No) {
+        if window.is_key_pressed(self.key_bindings.lock_enemies, minifb::KeyRepeat::No) {
             self.movement_locked = !self.movement_locked;
         }
 

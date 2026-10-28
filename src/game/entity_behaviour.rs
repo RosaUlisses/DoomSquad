@@ -103,6 +103,7 @@ pub fn ranged_enemy_behaviour(
             direction_to_player,
             renderer_data,
             0.0,
+            entity.key_bindings,
         );
         audio.play_sfx_distance_scaled("enemy_shoot", 1.0, player_position, entity.mover.position);
         if let Some(bullet) = bullet {
@@ -141,6 +142,7 @@ pub fn archer_behaviour(
             direction_to_player,
             renderer_data,
             0.0,
+            entity.key_bindings,
         );
         if let Some(arrow) = arrow {
             events.push(Spawn(arrow));
@@ -177,6 +179,7 @@ pub fn summoner_enemy_behaviour(
             direction_to_player,
             renderer_data,
             0.0,
+            entity.key_bindings,
         );
         audio.play_sfx_distance_scaled("summoner", 1.0, player_position, entity.mover.position);
         if let Some(melee_enemy) = melee_enemy {
@@ -274,6 +277,7 @@ pub fn death_behaviour(
             0.0,
             renderer_data,
             0.0,
+            entity.key_bindings,
         );
         audio.play_sfx_distance_scaled("explosion", 3.0, player_position, entity.mover.position);
         if let Some(explosion) = explosion {

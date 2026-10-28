@@ -19,7 +19,8 @@ use crate::game::interactables::InteractableEvent::*;
 use crate::parser::entities_parser::parse_entities;
 use crate::parser::interactables_parser::*;
 use crate::parser::player_parser::parse_player_position;
-use minifb::Window;
+use minifb::{Key, Window};
+use crate::game::key_bind_config::KeyBindConfig;
 
 const DESPAWN_TIME: i32 = 300;
 const MAP_GRID_CELL_SIZE: f64 = 64.0;
@@ -36,10 +37,11 @@ pub struct Game {
     pub projectile_that_hit: Vec<usize>,
     pub map_index: usize,
     pub last_map_index: usize,
+    pub key_bindings: KeyBindConfig,
 }
 
 impl Game {
-    pub fn new_game(renderer_data: &RendererData) -> Option<Self> {
+    pub fn new_game(renderer_data: &RendererData, key_bindings: KeyBindConfig) -> Option<Self> {
         let path = Path::new("assets/maps/ggb");
         let entries_result = fs::read_dir(path);
         let mut entries: Vec<_> = match entries_result {
@@ -64,6 +66,7 @@ impl Game {
             let game = Self {
                 player: Player::new_with_position(
                     parse_player_position(path.to_string(), renderer_data).ok()?,
+                            key_bindings,
                 ),
                 entities: parse_entities(path.to_string(), renderer_data).ok()?,
                 interactables: parse_interactables(path.to_string(), renderer_data).ok()?,
@@ -73,6 +76,7 @@ impl Game {
                 projectile_that_hit: Vec::new(),
                 map_index: 0,
                 last_map_index: 0,
+                key_bindings,
             };
 
             Some(game)

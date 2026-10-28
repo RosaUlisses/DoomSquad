@@ -15,6 +15,7 @@ use crate::render::RendererData;
 use crate::render::sprites::Sprite;
 
 use std::fmt;
+use crate::game::key_bind_config::KeyBindConfig;
 
 pub const ENTITY_DEFAULT_VIEW_HEIGHT: f64 = 15.0;
 const ENTITY_MOVEMENT_SMOOTHING_SPEED: f64 = 1.5;
@@ -143,6 +144,7 @@ pub struct Entity {
     pub size: f64,
     pub did_damage: bool,
     pub vertical_aim: f64,
+    pub key_bindings: KeyBindConfig
 }
 
 impl Entity {
@@ -159,6 +161,7 @@ impl Entity {
         hp: f64,
         size: f64,
         vertical_aim: f64,
+        key_bindings: KeyBindConfig,
     ) -> Option<Self> {
         let entity = Entity {
             mover: Mover {
@@ -186,6 +189,7 @@ impl Entity {
             size,
             did_damage: false,
             vertical_aim,
+            key_bindings,
         };
         Some(entity)
     }

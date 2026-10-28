@@ -15,6 +15,7 @@ dependencies = [
  "rodio",
  "ron",
  "serde",
+ "serde_json",
  "zip",
 ]
 

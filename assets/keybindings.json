@@ -1,0 +1,21 @@
+{
+  "backwards": "S",
+  "crouch": "C",
+  "enter_godmode": "G",
+  "exit_to_main_menu": "Escape",
+  "fire_arrow": "RightShift",
+  "fire_bullet": "RightCtrl",
+  "forwards": "W",
+  "interact": "F",
+  "jump": "Space",
+  "left": "A",
+  "lock_enemies": "L",
+  "move_crosshair_down": "Down",
+  "move_crosshair_up": "Up",
+  "right": "D",
+  "rocket_jump": "R",
+  "sprint": "LeftShift",
+  "toggle_fine_aiming": "E",
+  "turn_left": "Left",
+  "turn_right": "Right"
+}

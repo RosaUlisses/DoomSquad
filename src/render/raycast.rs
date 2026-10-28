@@ -15,6 +15,7 @@ use crate::game::{
     movement::Mover,
     player::{self, PLAYER_VIEW_HEIGHT, Player},
 };
+use crate::game::key_bind_config::KeyBindConfig;
 
 #[derive(Clone, PartialEq)]
 pub struct RayHit {
@@ -485,6 +486,7 @@ fn test_raycast() {
         jumping_allowed_timer: 0,
         vertcal_aim: 0.0,
         aim_mode: true,
+        key_bindings: KeyBindConfig::default(),
     };
 
     let map_slice = raycast(&map, 0.0, &placeholder_player);

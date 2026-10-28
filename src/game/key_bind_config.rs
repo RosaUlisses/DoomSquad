@@ -1,0 +1,182 @@
+use minifb::Key;
+use serde;
+#[derive(Clone, Copy)]
+pub struct KeyBindConfig {
+    pub forwards: Key,
+    pub backwards: Key,
+    pub left: Key,
+    pub right: Key,
+    pub sprint: Key,
+    pub jump: Key,
+    pub crouch: Key,
+    pub rocket_jump: Key,
+    pub interact: Key,
+    pub move_crosshair_up: Key,
+    pub move_crosshair_down: Key,
+    pub turn_left: Key,
+    pub turn_right: Key,
+    pub toggle_fine_aiming: Key,
+    pub fire_bullet: Key,
+    pub fire_arrow: Key,
+    pub enter_godmode: Key,
+    pub lock_enemies: Key,
+    pub exit_to_main_menu: Key,
+}
+
+impl KeyBindConfig {
+    pub fn new(
+        forwards: Key,
+        backwards: Key,
+        left: Key,
+        right: Key,
+        sprint: Key,
+        jump: Key,
+        crouch: Key,
+        rocket_jump: Key,
+        interact: Key,
+        move_crosshair_up: Key,
+        move_crosshair_down: Key,
+        turn_left: Key,
+        turn_right: Key,
+        toggle_fine_aiming: Key,
+        fire_bullet: Key,
+        fire_arrow: Key,
+        enter_godmode: Key,
+        lock_enemies: Key,
+        exit_to_main_menu: Key,
+    ) -> Self {
+        Self {
+            forwards,
+            backwards,
+            left,
+            right,
+            sprint,
+            jump,
+            crouch,
+            rocket_jump,
+            interact,
+            move_crosshair_up,
+            move_crosshair_down,
+            turn_left,
+            turn_right,
+            toggle_fine_aiming,
+            fire_bullet,
+            fire_arrow,
+            enter_godmode,
+            lock_enemies,
+            exit_to_main_menu,
+        }
+    }
+
+    pub fn default() -> Self {
+        Self {
+            forwards: Key::W,
+            backwards: Key::S,
+            left: Key::A,
+            right: Key::D,
+            sprint: Key::LeftShift,
+            jump: Key::Space,
+            crouch: Key::C,
+            rocket_jump: Key::R,
+            interact: Key::F,
+            move_crosshair_up: Key::Up,
+            move_crosshair_down: Key::Down,
+            turn_left: Key::Left,
+            turn_right: Key::Right,
+            toggle_fine_aiming: Key::E,
+            fire_bullet: Key::RightCtrl,
+            fire_arrow: Key::RightShift,
+            enter_godmode: Key::G,
+            lock_enemies: Key::L,
+            exit_to_main_menu: Key::Escape,
+        }
+    }
+
+    pub fn to_json(&self) -> Result<String, serde_json::Error> {
+        let json = serde_json::json!({
+            "forwards": format!("{:?}", self.forwards),
+            "backwards": format!("{:?}", self.backwards),
+            "left": format!("{:?}", self.left),
+            "right": format!("{:?}", self.right),
+            "sprint": format!("{:?}", self.sprint),
+            "jump": format!("{:?}", self.jump),
+            "crouch": format!("{:?}", self.crouch),
+            "rocket_jump": format!("{:?}", self.rocket_jump),
+            "interact": format!("{:?}", self.interact),
+            "move_crosshair_up": format!("{:?}", self.move_crosshair_up),
+            "move_crosshair_down": format!("{:?}", self.move_crosshair_down),
+            "turn_left": format!("{:?}", self.turn_left),
+            "turn_right": format!("{:?}", self.turn_right),
+            "toggle_fine_aiming": format!("{:?}", self.toggle_fine_aiming),
+            "fire_bullet": format!("{:?}", self.fire_bullet),
+            "fire_arrow": format!("{:?}", self.fire_arrow),
+            "enter_godmode": format!("{:?}", self.enter_godmode),
+            "lock_enemies": format!("{:?}", self.lock_enemies),
+            "exit_to_main_menu": format!("{:?}", self.exit_to_main_menu),
+        });
+
+        serde_json::to_string_pretty(&json)
+    }
+}
+
+pub fn string_to_key(name: &str) -> Key {
+    match name {
+        "A" => Key::A,
+        "B" => Key::B,
+        "C" => Key::C,
+        "D" => Key::D,
+        "E" => Key::E,
+        "F" => Key::F,
+        "G" => Key::G,
+        "H" => Key::H,
+        "I" => Key::I,
+        "J" => Key::J,
+        "K" => Key::K,
+        "L" => Key::L,
+        "M" => Key::M,
+        "N" => Key::N,
+        "O" => Key::O,
+        "P" => Key::P,
+        "Q" => Key::Q,
+        "R" => Key::R,
+        "S" => Key::S,
+        "T" => Key::T,
+        "U" => Key::U,
+        "V" => Key::V,
+        "W" => Key::W,
+        "X" => Key::X,
+        "Y" => Key::Y,
+        "Z" => Key::Z,
+
+        "Key0" => Key::Key0,
+        "Key1" => Key::Key1,
+        "Key2" => Key::Key2,
+        "Key3" => Key::Key3,
+        "Key4" => Key::Key4,
+        "Key5" => Key::Key5,
+        "Key6" => Key::Key6,
+        "Key7" => Key::Key7,
+        "Key8" => Key::Key8,
+        "Key9" => Key::Key9,
+
+        "Up" => Key::Up,
+        "Down" => Key::Down,
+        "Left" => Key::Left,
+        "Right" => Key::Right,
+
+        "Space" => Key::Space,
+        "Enter" => Key::Enter,
+        "Escape" => Key::Escape,
+        "Tab" => Key::Tab,
+        "Backspace" => Key::Backspace,
+
+        "LeftShift" => Key::LeftShift,
+        "RightShift" => Key::RightShift,
+        "LeftCtrl" => Key::LeftCtrl,
+        "RightCtrl" => Key::RightCtrl,
+        "LeftAlt" => Key::LeftAlt,
+        "RightAlt" => Key::RightAlt,
+
+        _ => panic!("Unsupported key: {name}"),
+    }
+}

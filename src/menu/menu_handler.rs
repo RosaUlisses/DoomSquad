@@ -10,6 +10,7 @@ use std::fs;
 
 use crate::audio::audio_handler::Audio;
 use crate::game::gamestate::Game;
+use crate::game::key_bind_config::KeyBindConfig;
 use crate::render::RendererData;
 
 const SCREEN_WIDTH: usize = 800;
@@ -30,6 +31,7 @@ pub enum AppState {
     Playing,
     GameOver,
     GamePaused,
+    KeyBindingsMenu,
     Quit,
 }
 
@@ -47,12 +49,14 @@ struct ButtonDef {
 /// we only need to manually track the mouse state for edge detection (clicks).
 pub struct Menu {
     was_mouse_down: bool,
+    waiting_for_key: Option<usize>,
 }
 
 impl Menu {
     pub fn new() -> Self {
         Self {
             was_mouse_down: false,
+            waiting_for_key: None,
         }
     }
 
@@ -64,6 +68,7 @@ impl Menu {
         game: &mut Game,
         renderer_data: &RendererData,
         audio: &mut Audio,
+        key_bindings: &mut KeyBindConfig
     ) -> AppState {
         // Clear the buffer from the previous frame
         buffer.fill(COL_BG_MAIN);
@@ -73,6 +78,7 @@ impl Menu {
         let click1 = window.is_key_pressed(Key::Key1, KeyRepeat::No);
         let click2 = window.is_key_pressed(Key::Key2, KeyRepeat::No);
         let click3 = window.is_key_pressed(Key::Key3, KeyRepeat::No);
+        let click4 = window.is_key_pressed(Key::Key4, KeyRepeat::No);
 
         // Render titles
         Self::draw_text_centered(
@@ -123,17 +129,25 @@ impl Menu {
             text: audio_text.to_string(),
         };
 
-        let btn_quit = ButtonDef {
+        let btn_key_bindings = ButtonDef {
             x: 230,
             y: 370,
             w: 340,
-            h: 50,
+            h: 30,
+            text: "[4] CHANGE KEY BINDINGS".to_string(),
+        };
+
+        let btn_quit = ButtonDef {
+            x: 230,
+            y: 420,
+            w: 340,
+            h: 30,
             text: "[ESC] QUIT GAME".to_string(),
         };
 
         // Interaction processing
         if self.draw_flat_button(buffer, &btn_start, mx, my) && clicked || click1 {
-            *game = Game::new_game(renderer_data).unwrap(); // ! this unwrap is intentionally accepted
+            *game = Game::new_game(renderer_data, key_bindings.clone()).unwrap(); // ! this unwrap is intentionally accepted
             game.map_swap(renderer_data, 1); // Jump straight to map 1 (map 0 is reserved for testing)
             return AppState::Playing;
         }
@@ -144,7 +158,7 @@ impl Menu {
             if let Ok(content) = fs::read_to_string("savegame.txt")
                 && let Ok(index) = content.trim().parse::<usize>()
             {
-                *game = Game::new_game(renderer_data).unwrap(); // ! this unwrap is intentionally accepted
+                *game = Game::new_game(renderer_data, key_bindings.clone()).unwrap(); // ! this unwrap is intentionally accepted
                 game.map_swap(renderer_data, index);
                 return AppState::Playing;
             }
@@ -155,12 +169,174 @@ impl Menu {
             return AppState::StartScreen;
         }
 
+        if self.draw_flat_button(buffer, &btn_key_bindings, mx, my) && clicked || click4 {
+            return AppState::KeyBindingsMenu;
+        }
+
         if self.draw_flat_button(buffer, &btn_quit, mx, my) && clicked {
             return AppState::Quit;
         }
 
+        
         // Keep looping in the menu until an action changes the state
         AppState::StartScreen
+    }
+
+    pub fn update_and_draw_key_bindings_menu(
+        &mut self,
+        window: &mut Window,
+        buffer: &mut [u32],
+        game: &mut Game,
+        key_bindings: &mut KeyBindConfig,
+    ) -> AppState {
+        buffer.fill(COL_BG_MAIN);
+
+        let (mx, my, clicked) = self.get_mouse_state(window);
+
+        // Only capture keyboard input if we were already waiting
+        // before this frame's mouse click.
+        let pending = self.waiting_for_key;
+
+        let pressed_key = if pending.is_some() {
+            window
+                .get_keys_pressed(KeyRepeat::No)
+                .into_iter()
+                .next()
+        } else {
+            None
+        };
+
+        Self::draw_text_centered(
+            buffer,
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
+            "KEY BINDINGS",
+            20,
+            3,
+            COL_TITLE_RED,
+        );
+
+        Self::draw_text_centered(
+            buffer,
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
+            "Click a binding, then press its replacement key.",
+            58,
+            1,
+            COL_TEXT_WHITE,
+        );
+
+        let back_button = ButtonDef {
+            x: 210,
+            y: 400,
+            w: 180,
+            h: 32,
+            text: "BACK".to_string(),
+        };
+
+        if self.draw_flat_button(buffer, &back_button, mx, my) && clicked {
+            self.waiting_for_key = None;
+            return AppState::StartScreen;
+        }
+
+        if pending.is_some() {
+            let cancel_button = ButtonDef {
+                x: 410,
+                y: 400,
+                w: 180,
+                h: 32,
+                text: "CANCEL".to_string(),
+            };
+
+            if self.draw_flat_button(buffer, &cancel_button, mx, my) && clicked {
+                self.waiting_for_key = None;
+                return AppState::KeyBindingsMenu;
+            }
+        }
+
+        let rows = [
+            ("Move forwards", &mut key_bindings.forwards),
+            ("Move backwards", &mut key_bindings.backwards),
+            ("Move left", &mut key_bindings.left),
+            ("Move right", &mut key_bindings.right),
+            ("Sprint", &mut key_bindings.sprint),
+            ("Jump", &mut key_bindings.jump),
+            ("Crouch", &mut key_bindings.crouch),
+            ("Rocket jump", &mut key_bindings.rocket_jump),
+            ("Interact", &mut key_bindings.interact),
+            ("Crosshair up", &mut key_bindings.move_crosshair_up),
+            ("Crosshair down", &mut key_bindings.move_crosshair_down),
+            ("Turn left", &mut key_bindings.turn_left),
+            ("Turn right", &mut key_bindings.turn_right),
+            ("Toggle fine aiming", &mut key_bindings.toggle_fine_aiming),
+            ("Fire bullet", &mut key_bindings.fire_bullet),
+            ("Fire arrow", &mut key_bindings.fire_arrow),
+            ("God mode", &mut key_bindings.enter_godmode),
+            ("Lock enemies", &mut key_bindings.lock_enemies),
+            ("Pause / menu", &mut key_bindings.exit_to_main_menu),
+        ];
+
+        for (index, (label, binding)) in rows.into_iter().enumerate() {
+            if pending == Some(index) {
+                if let Some(key) = pressed_key {
+                    *binding = key;
+                    self.waiting_for_key = None;
+                }
+            }
+
+            let column = index / 10;
+            let row = index % 10;
+
+            let x = 20 + column * 390;
+            let y = 86 + row * 28;
+
+            let selected = self.waiting_for_key == Some(index);
+
+            Self::draw_text(
+                buffer,
+                SCREEN_WIDTH,
+                SCREEN_HEIGHT,
+                label,
+                x,
+                y + 8,
+                1,
+                if selected {
+                    COL_TITLE_BLUE
+                } else {
+                    COL_TEXT_WHITE
+                },
+            );
+
+            let button = ButtonDef {
+                x: x + 180,
+                y,
+                w: 180,
+                h: 24,
+                text: if selected {
+                    "PRESS KEY".to_string()
+                } else {
+                    format!("{:?}", *binding)
+                },
+            };
+
+            if self.draw_flat_button(buffer, &button, mx, my) && clicked {
+                self.waiting_for_key = Some(index);
+            }
+        }
+
+        game.key_bindings = *key_bindings;
+
+        Self::draw_text_centered(
+            buffer,
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
+            "Changes apply immediately after clicking on the back button",
+            375,
+            1,
+            COL_TEXT_WHITE,
+        );
+
+        AppState::KeyBindingsMenu
     }
 
     /// Renders the death screen and allows the user to save their current level progress.
